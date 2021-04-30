@@ -80,6 +80,12 @@ type chart struct {
 	LegendColorizeRows         bool          `yaml:"legendColorize_rows,omitempty"`
 	LegendOpacity              float64       `yaml:"legendOpacity,omitempty"`
 	LegendOrientationThreshold int           `yaml:"legendOrientationThreshold,omitempty"`
+	Zoom                       float64
+	Center                     center
+	MapStyle                   string
+	AllowPanAndZoom            bool
+	DetectCoordinateFields     bool
+	GeoLayers                  []geoLayer
 }
 
 type legend struct {
@@ -110,16 +116,39 @@ type axis struct {
 }
 
 type fieldOption struct {
-	FieldName   string `yaml:"field_name"`
-	DisplayName string `yaml:"display_name"`
-	Visible     bool   `yaml:"visible"`
+	FieldName   string `yaml:"field_name,omitempty"`
+	DisplayName string `yaml:"display_name,omitempty"`
+	Visible     bool   `yaml:"visible,omitempty"`
 }
 
 type tableOptions struct {
-	VerticalTimeAxis bool   `yaml:"verticalTimeAxis"`
-	SortByField      string `yaml:"sortByField"`
-	Wrapping         string `yaml:"wrapping"`
-	FixFirstColumn   bool   `yaml:"fixFirstColumn"`
+	VerticalTimeAxis bool   `yaml:"verticalTimeAxis,omitempty"`
+	SortByField      string `yaml:"sortByField,omitempty"`
+	Wrapping         string `yaml:"wrapping,omitempty"`
+	FixFirstColumn   bool   `yaml:"fixFirstColumn,omitempty"`
+}
+
+type center struct {
+	Lat float64 `yaml:"lat,omitempty"`
+	Lon float64 `yaml:"lon,omitempty"`
+}
+
+type geoLayer struct {
+	Type               string  `yaml:"type,omitempty"`
+	RadiusField        string  `yaml:"radiusField,omitempty"`
+	ColorField         string  `yaml:"colorField,omitempty"`
+	IntensityField     string  `yaml:"intensityField,omitempty"`
+	ViewColors         []color `yaml:"viewColors,omitempty"`
+	Radius             int32   `yaml:"radius,omitempty"`
+	Blur               int32   `yaml:"blur,omitempty"`
+	RadiusDimension    *axis   `yaml:"radiusDimension,omitempty"`
+	ColorDimension     *axis   `yaml:"colorDimension,omitempty"`
+	IntensityDimension *axis   `yaml:"intensityDimension,omitempty"`
+	InterpolateColors  bool    `yaml:"interpolateColors,omitempty"`
+	TrackWidth         int32   `yaml:"trackWidth,omitempty"`
+	Speed              int32   `yaml:"speed,omitempty"`
+	RandomColors       bool    `yaml:"randomColors,omitempty"`
+	IsClustered        bool    `yaml:"isClustered,omitempty"`
 }
 
 type task struct {

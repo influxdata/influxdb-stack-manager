@@ -12,9 +12,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// decode will populate the given directory with the decoded
-// contents of the yaml file.
-func decode(dir string, r io.Reader) error {
+// split the contents of the reader into seperate templates and
+func split(dir string, r io.Reader) error {
 	seenNames := map[string]struct{}{}
 
 	decoder := yaml.NewDecoder(r)
@@ -34,7 +33,7 @@ func decode(dir string, r io.Reader) error {
 			return fmt.Errorf("unable to decode spec: %v", err)
 		}
 
-		dir := filepath.Join(dir, escapeName(spec.Name))
+		dir := filepath.Join(dir, obj.Kind, escapeName(spec.Name))
 		// Check whether we have a name collision, just error if so.
 		if _, ok := seenNames[dir]; ok {
 			return fmt.Errorf("name collision detected: %q appears more than once", dir)
@@ -117,7 +116,7 @@ func writeTemplate(dir string, tmpl interface{}) error {
 		return fmt.Errorf("unable to marshal object: %v", err)
 	}
 
-	filename := filepath.Join(dir, "template.yaml")
+	filename := filepath.Join(dir, "template.yml")
 	if err := os.WriteFile(filename, b, 0644); err != nil {
 		return fmt.Errorf("unable to write template to file: %v", err)
 	}

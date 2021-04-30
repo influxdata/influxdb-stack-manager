@@ -1,0 +1,91 @@
+apiVersion: influxdata.com/v2alpha1
+kind: Dashboard
+metadata:
+    name: eager-cori-839000
+spec:
+    name: Test Dashboard (Updated)
+    description: With a new fancy description!
+    associations:
+        - kind: Label
+          name: cool-ride-8cd001
+    charts:
+        - kind: Xy
+          name: CPU Usage (Updated)
+          hoverDimension: auto
+          colors:
+            - id: acc6b9a5-b4b0-496a-8b6b-5f9d552e3602
+              name: Solid Blue
+              type: scale
+              hex: '#00A3FF'
+            - id: e5733dfd-4645-4de6-b4f2-1c448794f01a
+              name: Solid Blue
+              type: scale
+              hex: '#00A3FF'
+            - id: 0dbb9942-2cbf-4051-b615-63e9bd28b45a
+              name: Solid Blue
+              type: scale
+              hex: '#00A3FF'
+          queries:
+            - query: file://CPU Usage (Updated)_Xy_0.flux
+          axes:
+            - base: "10"
+              name: x
+              scale: linear
+            - base: "10"
+              name: "y"
+              scale: linear
+          geom: line
+          xCol: _time
+          yCol: _value
+          height: 4
+          width: 4
+          position: overlaid
+          legendOpacity: 1
+          legendOrientationThreshold: 10
+        - kind: Single_Stat
+          name: CPU
+          decimalPlaces: 2
+          colors:
+            - id: base
+              name: laser
+              type: text
+              hex: '#00C9FF'
+          queries:
+            - query: file://CPU_Single_Stat_0.flux
+          yPos: 4
+          height: 4
+          width: 4
+        - kind: Xy
+          name: Memory Usage
+          hoverDimension: auto
+          colors:
+            - id: 2fa02db5-8a99-4959-94f8-3968a9df47f4
+              name: Nineteen Eighty Four
+              type: scale
+              hex: '#31C0F6'
+            - id: e768ea46-8bba-44f0-8953-348f7d7b1b5a
+              name: Nineteen Eighty Four
+              type: scale
+              hex: '#A500A5'
+            - id: 4b75fbe8-f815-4108-a623-a83892d4620d
+              name: Nineteen Eighty Four
+              type: scale
+              hex: '#FF7E27'
+          queries:
+            - query: file://Memory Usage_Xy_0.flux
+          axes:
+            - base: "10"
+              name: x
+              scale: linear
+            - base: "10"
+              name: "y"
+              scale: linear
+          geom: line
+          xCol: _time
+          yCol: _value
+          xPos: 4
+          height: 4
+          width: 4
+          position: overlaid
+          legendOpacity: 1
+          legendOrientationThreshold: 10
