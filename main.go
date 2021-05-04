@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -23,6 +24,8 @@ Flags:
 `
 
 func main() {
+	log.SetFlags(0)
+
 	args := os.Args
 	if len(args) < 2 {
 		fmt.Println(usage)

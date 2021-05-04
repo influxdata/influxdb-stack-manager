@@ -22,8 +22,6 @@ func uniteTemplate(dir string, w io.Writer) error {
 		return fmt.Errorf("unable to read dir %q: %w", dir, err)
 	}
 
-	fmt.Println("Kinds:", kinds)
-
 	enc := yaml.NewEncoder(w)
 	enc.SetIndent(2)
 	defer enc.Close()
@@ -120,8 +118,6 @@ func readObject(dir string) (*object, error) {
 }
 
 func readTemplate(dir string, v interface{}) error {
-	fmt.Println("reading template", dir)
-
 	templateFile := filepath.Join(dir, "template.yml")
 	f, err := os.Open(templateFile)
 	if err != nil {
