@@ -33,17 +33,10 @@ spec:
     kind: Xy
     legendOpacity: 1
     legendOrientationThreshold: 10
-    name: CPU Usage (Updated)
+    name: CPU Usage
     position: overlaid
     queries:
-    - query: |-
-        from(bucket: "laptop")
-          |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-          |> filter(fn: (r) => r["_measurement"] == "cpu")
-          |> filter(fn: (r) => r["_field"] == "usage_user")
-          |> filter(fn: (r) => r["cpu"] == "cpu-total")
-          |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-          |> yield(name: "mean")
+      - query: file://CPU Usage_Xy.flux
     width: 4
     xCol: _time
     yCol: _value
@@ -57,14 +50,7 @@ spec:
     kind: Single_Stat
     name: CPU
     queries:
-    - query: |-
-        from(bucket: "laptop")
-          |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-          |> filter(fn: (r) => r["_measurement"] == "cpu")
-          |> filter(fn: (r) => r["_field"] == "usage_user")
-          |> filter(fn: (r) => r["cpu"] == "cpu-total")
-          |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-          |> yield(name: "mean")
+      - query: file://CPU_Single_Stat.flux
     width: 4
     yPos: 4
   - axes:
@@ -96,16 +82,10 @@ spec:
     name: Memory Usage
     position: overlaid
     queries:
-    - query: |-
-        from(bucket: "laptop")
-          |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-          |> filter(fn: (r) => r["_measurement"] == "mem")
-          |> filter(fn: (r) => r["_field"] == "used_percent")
-          |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-          |> yield(name: "mean")
+      - query: file://Memory Usage_Xy.flux
     width: 4
     xCol: _time
     xPos: 4
     yCol: _value
   description: With a new fancy description!
-  name: Test Dashboard (Updated)
+  name: Test Dashboard

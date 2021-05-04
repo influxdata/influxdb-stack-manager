@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,8 +13,29 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func split(args []string) {
+const splitUsage = `
+Split a template file into separate templates and flux queries.
 
+Usage:
+  influxdb-stack-manager split <src> <dest>
+
+Where src is a yaml template file, and dest is a directory.
+`
+
+func split(args []string) {
+	if len(args) != 2 {
+		log.Fatal("Expected exactly two args")
+	}
+
+	f, err := os.Open(args[0])
+	if err != nil {
+		log.Fatalf("couldn't open template file %q: %v", args[0], err)
+	}
+	defer f.Close()
+
+	if err := splitTemplate(args[1], f); err != nil {
+		log.Fatalf("couldn't split template: %v", err)
+	}
 }
 
 // split the contents of the reader into seperate templates and
@@ -30,14 +52,7 @@ func splitTemplate(dir string, r io.Reader) error {
 			return fmt.Errorf("unable to decode template: %v", err)
 		}
 
-		var spec struct {
-			Name string `yaml:"name"`
-		}
-		if err := obj.Spec.Decode(&spec); err != nil {
-			return fmt.Errorf("unable to decode spec: %v", err)
-		}
-
-		dir := filepath.Join(dir, obj.Kind, escapeName(spec.Name))
+		dir := filepath.Join(dir, obj.Kind, escapeName(walkNode(&obj.Spec, "name").Value))
 		// Check whether we have a name collision, just error if so.
 		if _, ok := seenNames[dir]; ok {
 			return fmt.Errorf("name collision detected: %q appears more than once", dir)
@@ -48,84 +63,46 @@ func splitTemplate(dir string, r io.Reader) error {
 			return fmt.Errorf("unable to make directory %q: %v", dir, err)
 		}
 
-		var err error
+		var queryNodes []queryNode
 		switch obj.Kind {
 		case kindDashboard:
-			err = writeDashboard(dir, obj)
+			queryNodes = walkDashboard(&obj.Spec)
 
 		case kindTask:
-			err = writeTask(dir, obj)
-
-		default:
-			err = writeTemplate(dir, obj)
+			queryNodes = walkTask(&obj.Spec)
 		}
-		if err != nil {
-			return fmt.Errorf("unable to decode %q: %v", dir, err)
-		}
-	}
-}
 
-func writeDashboard(dir string, obj object) error {
-	d := dashboard{
-		APIVersion: obj.APIVersion,
-		Kind:       obj.Kind,
-		Metadata:   obj.Metadata,
-	}
-	if err := obj.Spec.Decode(&d.Spec); err != nil {
-		return fmt.Errorf("unable to unmarshal dashboard spec: %v", err)
-	}
-
-	queryNames := map[string]int{}
-	for i, chart := range d.Spec.Charts {
-		for j, query := range chart.Queries {
-			// Try and generate a unique name for the query
-			name := escapeName(chart.Name + "_" + chart.Kind)
-			filename := fmt.Sprintf("%s_%d.flux", name, queryNames[name])
+		queryNames := map[string]int{}
+		for _, qn := range queryNodes {
+			var name string
+			if n, ok := queryNames[name]; ok {
+				name = fmt.Sprintf("%s_%d.flux", qn.Name, n)
+			} else {
+				name = fmt.Sprintf("%s.flux", qn.Name)
+			}
 			queryNames[name]++
 
-			if err := os.WriteFile(filepath.Join(dir, filename), []byte(query.Query), 0644); err != nil {
-				return fmt.Errorf("unable to write query to file %q: %v", name, err)
+			// Write out the query to file
+			if err := os.WriteFile(filepath.Join(dir, name), []byte(qn.Node.Value), 0644); err != nil {
+				return fmt.Errorf("unable to write query to file '%s/%s': %v", dir, name, err)
 			}
+			qn.Node.Value = fmt.Sprintf("file://%s", name)
+			qn.Node.Style = yaml.FlowStyle
+		}
 
-			// Update the query in the template to just a link
-			d.Spec.Charts[i].Queries[j].Query = fmt.Sprintf("file://%s", filename)
+		filename := filepath.Join(dir, "template.yml")
+		f, err := os.Create(filename)
+		if err != nil {
+			return fmt.Errorf("unable to create file %q: %v", filename, err)
+		}
+		defer f.Close()
+
+		enc := yaml.NewEncoder(f)
+		enc.SetIndent(2)
+		if err := enc.Encode(obj); err != nil {
+			return fmt.Errorf("unable to marshal object: %v", err)
 		}
 	}
-
-	return writeTemplate(dir, d)
-}
-
-func writeTask(dir string, obj object) error {
-	t := task{
-		APIVersion: obj.APIVersion,
-		Kind:       obj.Kind,
-		Metadata:   obj.Metadata,
-	}
-	if err := obj.Spec.Decode(&t.Spec); err != nil {
-		return fmt.Errorf("unable to unmarshal task spec: %v", err)
-	}
-
-	// Write out the query to file
-	if err := os.WriteFile(filepath.Join(dir, "query.flux"), []byte(t.Spec.Query), 0644); err != nil {
-		return fmt.Errorf("unable to write query to file: %v", err)
-	}
-
-	t.Spec.Query = "file://query.flux"
-	return writeTemplate(dir, t)
-}
-
-func writeTemplate(dir string, tmpl interface{}) error {
-	b, err := yaml.Marshal(tmpl)
-	if err != nil {
-		return fmt.Errorf("unable to marshal object: %v", err)
-	}
-
-	filename := filepath.Join(dir, "template.yml")
-	if err := os.WriteFile(filename, b, 0644); err != nil {
-		return fmt.Errorf("unable to write template to file: %v", err)
-	}
-
-	return nil
 }
 
 // escapeName removes any characters from a name that are not valid in a filename

@@ -25,9 +25,11 @@ Flags:
 
 func main() {
 	log.SetFlags(0)
+	run(os.Args[1:])
+}
 
-	args := os.Args
-	if len(args) < 2 {
+func run(args []string) {
+	if len(args) == 0 {
 		fmt.Println(usage)
 		return
 	}
@@ -48,4 +50,5 @@ func main() {
 	default:
 		fmt.Println(usage)
 	}
+
 }

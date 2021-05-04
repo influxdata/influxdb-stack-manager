@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -12,8 +12,29 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func unite(args []string) {
+const uniteUsage = `
+Unite a set of templates/flux queries back into a single template.
 
+Usage:
+  influxdb-stack-manager unite <src> <dest>
+
+Where src is a directory, and dest is a template file.
+`
+
+func unite(args []string) {
+	if len(args) != 2 {
+		log.Fatal("Expected exactly two args")
+	}
+
+	f, err := os.Create(args[1])
+	if err != nil {
+		log.Fatalf("couldn't create template file %q: %v", args[1], err)
+	}
+	defer f.Close()
+
+	if err := uniteTemplate(args[0], f); err != nil {
+		log.Fatalf("couldn't split template: %v", err)
+	}
 }
 
 func uniteTemplate(dir string, w io.Writer) error {
@@ -39,94 +60,39 @@ func uniteTemplate(dir string, w io.Writer) error {
 			}
 			dir := filepath.Join(dir, item.Name())
 
-			var obj interface{}
-			var err error
-			switch k {
+			templateFile := filepath.Join(dir, "template.yml")
+			b, err := os.ReadFile(templateFile)
+			if err != nil {
+				return fmt.Errorf("unable to open file %q: %v", templateFile, err)
+			}
+
+			var obj object
+			if err := yaml.Unmarshal(b, &obj); err != nil {
+				return fmt.Errorf("unable to decode template %q: %v", templateFile, err)
+			}
+
+			var queryNodes []queryNode
+			switch obj.Kind {
 			case kindDashboard:
-				obj, err = readDashboard(dir)
+				queryNodes = walkDashboard(&obj.Spec)
 
 			case kindTask:
-				obj, err = readTask(dir)
-
-			default:
-				obj, err = readObject(dir)
+				queryNodes = walkTask(&obj.Spec)
 			}
-			if err != nil {
-				return err
+
+			for _, qn := range queryNodes {
+				filename := filepath.Join(dir, strings.TrimPrefix(qn.Node.Value, "file://"))
+				b, err := os.ReadFile(filename)
+				if err != nil {
+					return fmt.Errorf("unable to read query file %q: %v", filename, err)
+				}
+				qn.Node.SetString(string(b))
 			}
 
 			if err := enc.Encode(obj); err != nil {
-				return fmt.Errorf("unable to encode object from %q: %v", dir, err)
+				return fmt.Errorf("unable to encode object: %v", err)
 			}
 		}
-	}
-
-	return nil
-}
-
-func readDashboard(dir string) (*dashboard, error) {
-	var db dashboard
-	if err := readTemplate(dir, &db); err != nil {
-		return nil, err
-	}
-
-	for i, c := range db.Spec.Charts {
-		for j, q := range c.Queries {
-			if !strings.HasPrefix(q.Query, "file://") {
-				continue
-			}
-
-			filename := filepath.Join(dir, q.Query)
-			b, err := ioutil.ReadFile(filepath.Join(dir, strings.TrimPrefix(q.Query, "file://")))
-			if err != nil {
-				return nil, fmt.Errorf("unable to read query from file %s: %w", filename, err)
-			}
-
-			db.Spec.Charts[i].Queries[j].Query = string(b)
-		}
-	}
-
-	return &db, nil
-}
-
-func readTask(dir string) (*task, error) {
-	var t task
-	if err := readTemplate(dir, &t); err != nil {
-		return nil, err
-	}
-
-	if !strings.HasPrefix(t.Spec.Query, "file://") {
-		return &t, nil
-	}
-
-	queryFile := filepath.Join(dir, strings.TrimPrefix(t.Spec.Query, "file://"))
-	b, err := ioutil.ReadFile(queryFile)
-	if err != nil {
-		return nil, fmt.Errorf("unable to read query from file %s: %w", queryFile, err)
-	}
-
-	t.Spec.Query = string(b)
-	return &t, nil
-}
-
-func readObject(dir string) (*object, error) {
-	var obj object
-	if err := readTemplate(dir, &obj); err != nil {
-		return nil, err
-	}
-	return &obj, nil
-}
-
-func readTemplate(dir string, v interface{}) error {
-	templateFile := filepath.Join(dir, "template.yml")
-	f, err := os.Open(templateFile)
-	if err != nil {
-		return fmt.Errorf("unable to open file %q: %v", templateFile, err)
-	}
-	defer f.Close()
-
-	if err := yaml.NewDecoder(f).Decode(v); err != nil {
-		return fmt.Errorf("unable to decode template %q: %v", templateFile, err)
 	}
 
 	return nil

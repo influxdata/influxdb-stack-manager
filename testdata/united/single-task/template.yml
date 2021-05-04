@@ -5,10 +5,10 @@ metadata:
 spec:
   name: CPU Downsample
   associations:
-  - kind: Label
-    name: rapid-donkey-17283
+    - kind: Label
+      name: rapid-donkey-17283
   every: 1h
-  query: |-
+  query: |
     from(bucket: "cpu")
       |> range(start: -1h)
       |> filter(fn: (r) => r._measurement == "cpu")

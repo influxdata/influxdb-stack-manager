@@ -1,0 +1,5 @@
+from(bucket: "cpu")
+  |> range(start: -1h)
+  |> filter(fn: (r) => r._measurement == "cpu")
+  |> aggregateWindow(every: 5m, fn: mean)
+  |> to(bucket: "cpu_downsample")
