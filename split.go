@@ -12,8 +12,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+func split(args []string) {
+
+}
+
 // split the contents of the reader into seperate templates and
-func split(dir string, r io.Reader) error {
+func splitTemplate(dir string, r io.Reader) error {
 	seenNames := map[string]struct{}{}
 
 	decoder := yaml.NewDecoder(r)

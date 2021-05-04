@@ -12,7 +12,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func unite(dir string, w io.Writer) error {
+func unite(args []string) {
+
+}
+
+func uniteTemplate(dir string, w io.Writer) error {
 	kinds, err := listKindDirs(dir)
 	if err != nil {
 		return fmt.Errorf("unable to read dir %q: %w", dir, err)
