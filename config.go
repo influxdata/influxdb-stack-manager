@@ -19,6 +19,7 @@ type config struct {
 	help      bool
 	directory string
 	influxCmd string
+	dryRun    bool
 }
 
 // flagSet generates a flagSet to use in parsing the flags.
@@ -34,6 +35,7 @@ func (cfg *config) flagSet() *pflag.FlagSet {
 	fs.BoolVarP(&cfg.help, "help", "h", false, "Display help for this command.")
 	fs.StringVarP(&cfg.directory, "directory", "d", "templates", "Directory to read and write templates from/to.")
 	fs.StringVar(&cfg.influxCmd, "influx-cmd", "influx", "Command to call the influx cli, if it not in your path.")
+	fs.BoolVar(&cfg.dryRun, "dry-run", false, "Prints the command piped to the influx cli tool instead of running it if set.")
 	return fs
 }
 

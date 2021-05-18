@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 const pullUsage = `Pull a template from a stack in influx db and split it.
@@ -36,7 +37,15 @@ func pull(args []string) error {
 		return errors.New("Error: required arg missing: stack-id\nSee 'influxdb-stack-manager pull -h' for help")
 	}
 
-	cmd := exec.Command(cfg.influxCmd, append([]string{"export", "stack", fs.Arg(0)}, cfg.generateArgs()...)...)
+	args = []string{"export", "stack", fs.Arg(0)}
+	args = append(args, cfg.generateArgs()...)
+	if cfg.dryRun {
+		log.Println("Dry run - calling:")
+		log.Println(cfg.influxCmd, strings.Join(args, " "))
+		return nil
+	}
+
+	cmd := exec.Command(cfg.influxCmd, args...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = os.Stderr
