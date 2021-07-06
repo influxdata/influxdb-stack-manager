@@ -4,88 +4,88 @@ metadata:
   name: eager-cori-839000
 spec:
   associations:
-  - kind: Label
-    name: cool-ride-8cd001
+    - kind: Label
+      name: cool-ride-8cd001
   charts:
-  - axes:
-    - base: "10"
-      name: x
-      scale: linear
-    - base: "10"
-      name: y
-      scale: linear
-    colors:
-    - hex: '#00A3FF'
-      id: acc6b9a5-b4b0-496a-8b6b-5f9d552e3602
-      name: Solid Blue
-      type: scale
-    - hex: '#00A3FF'
-      id: e5733dfd-4645-4de6-b4f2-1c448794f01a
-      name: Solid Blue
-      type: scale
-    - hex: '#00A3FF'
-      id: 0dbb9942-2cbf-4051-b615-63e9bd28b45a
-      name: Solid Blue
-      type: scale
-    geom: line
-    height: 4
-    hoverDimension: auto
-    kind: Xy
-    legendOpacity: 1
-    legendOrientationThreshold: 10
-    name: CPU Usage
-    position: overlaid
-    queries:
-      - query: file://CPU Usage_Xy.flux
-    width: 4
-    xCol: _time
-    yCol: _value
-  - colors:
-    - hex: '#00C9FF'
-      id: base
-      name: laser
-      type: text
-    decimalPlaces: 2
-    height: 4
-    kind: Single_Stat
-    name: CPU
-    queries:
-      - query: file://CPU_Single_Stat.flux
-    width: 4
-    yPos: 4
-  - axes:
-    - base: "10"
-      name: x
-      scale: linear
-    - base: "10"
-      name: y
-      scale: linear
-    colors:
-    - hex: '#31C0F6'
-      id: 2fa02db5-8a99-4959-94f8-3968a9df47f4
-      name: Nineteen Eighty Four
-      type: scale
-    - hex: '#A500A5'
-      id: e768ea46-8bba-44f0-8953-348f7d7b1b5a
-      name: Nineteen Eighty Four
-      type: scale
-    - hex: '#FF7E27'
-      id: 4b75fbe8-f815-4108-a623-a83892d4620d
-      name: Nineteen Eighty Four
-      type: scale
-    geom: line
-    height: 4
-    hoverDimension: auto
-    kind: Xy
-    legendOpacity: 1
-    legendOrientationThreshold: 10
-    name: Memory Usage
-    position: overlaid
-    queries:
-      - query: file://Memory Usage_Xy.flux
-    width: 4
-    xCol: _time
-    xPos: 4
-    yCol: _value
+    - axes:
+        - base: '10'
+          name: x
+          scale: linear
+        - base: '10'
+          name: y
+          scale: linear
+      colors:
+        - hex: '#00A3FF'
+          id: acc6b9a5-b4b0-496a-8b6b-5f9d552e3602
+          name: Solid Blue
+          type: scale
+        - hex: '#00A3FF'
+          id: e5733dfd-4645-4de6-b4f2-1c448794f01a
+          name: Solid Blue
+          type: scale
+        - hex: '#00A3FF'
+          id: 0dbb9942-2cbf-4051-b615-63e9bd28b45a
+          name: Solid Blue
+          type: scale
+      geom: line
+      height: 4
+      hoverDimension: auto
+      kind: Xy
+      legendOpacity: 1
+      legendOrientationThreshold: 10
+      name: CPU Usage
+      position: overlaid
+      queries:
+        - query: file://CPU Usage_Xy.flux
+      width: 4
+      xCol: _time
+      yCol: _value
+    - colors:
+        - hex: '#00C9FF'
+          id: base
+          name: laser
+          type: text
+      decimalPlaces: 2
+      height: 4
+      kind: Single_Stat
+      name: CPU
+      queries:
+        - query: file://CPU_Single_Stat.flux
+      width: 4
+      yPos: 4
+    - axes:
+        - base: '10'
+          name: x
+          scale: linear
+        - base: '10'
+          name: y
+          scale: linear
+      colors:
+        - hex: '#31C0F6'
+          id: 2fa02db5-8a99-4959-94f8-3968a9df47f4
+          name: Nineteen Eighty Four
+          type: scale
+        - hex: '#A500A5'
+          id: e768ea46-8bba-44f0-8953-348f7d7b1b5a
+          name: Nineteen Eighty Four
+          type: scale
+        - hex: '#FF7E27'
+          id: 4b75fbe8-f815-4108-a623-a83892d4620d
+          name: Nineteen Eighty Four
+          type: scale
+      geom: line
+      height: 4
+      hoverDimension: auto
+      kind: Xy
+      legendOpacity: 1
+      legendOrientationThreshold: 10
+      name: Memory Usage
+      position: overlaid
+      queries:
+        - query: file://Memory Usage_Xy.flux
+      width: 4
+      xCol: _time
+      xPos: 4
+      yCol: _value
   description: With a new fancy description!
   name: Test Dashboard
