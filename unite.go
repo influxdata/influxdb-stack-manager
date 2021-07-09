@@ -21,24 +21,31 @@ const uniteUsage = `
 Unite a set of templates/flux queries back into a single template.
 
 Usage:
-  influxdb-stack-manager unite <src> <dest>
+  influxdb-stack-manager unite <src> <dest> [flags]
 
 Where src is a directory, and dest is a template file.
+
+Flags:
 `
 
 // unite separated template files and flux queries into a single template.
 func unite(args []string) error {
 	var dataFile string
+	var help bool
 	fs := pflag.NewFlagSet("config", pflag.ContinueOnError)
 	fs.StringVar(&dataFile, "data-file", "", "Data file to use for injected data in templates")
+	fs.BoolVarP(&help, "help", "h", false, "Display help for this command.")
 	if err := fs.Parse(args); err != nil {
 		return fmt.Errorf("Error: %v\nSee 'influxdb-stack-manager push -h' for help", err)
 	}
 
 	args = fs.Args()
+	if help {
+		log.Println(uniteUsage + fs.FlagUsages())
+		return nil
+	}
 	if len(args) != 2 {
-		log.Println(uniteUsage)
-		return errors.New("expected exactly two args")
+		return errors.New("Error: wrong number of args\nSee 'influxdb-stack-manager unite -h' for help")
 	}
 
 	f, err := os.Create(args[1])

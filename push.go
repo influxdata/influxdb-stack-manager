@@ -14,7 +14,8 @@ const pushUsage = `Push local changes to a stack in influxdb
 Usage:
   influxdb-stack-manager push <stack-id> [flags]
 
-Flags:`
+Flags:
+`
 
 func push(args []string) error {
 	var cfg config

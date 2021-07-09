@@ -1,5 +1,5 @@
 {
-  "Measurement": "cpu",
+  "measurement": "cpu",
   "Stats": {
     "Mem": "mean",
     "CPU": "mean"

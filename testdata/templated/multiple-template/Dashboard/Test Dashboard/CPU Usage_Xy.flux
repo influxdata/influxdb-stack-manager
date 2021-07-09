@@ -1,6 +1,6 @@
 from(bucket: "laptop")
   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => r["_measurement"] == "{{ .Measurement }}")
+  |> filter(fn: (r) => r["_measurement"] == "{{ .measurement }}")
   |> filter(fn: (r) => r["_field"] == "usage_user")
   |> filter(fn: (r) => r["cpu"] == "cpu-total")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)

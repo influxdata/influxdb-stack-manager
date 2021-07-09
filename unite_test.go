@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"errors"
 	"io"
 	"os"
@@ -83,16 +81,8 @@ func loadOutput(t *testing.T, filename string) []interface{} {
 		t.Fatalf("unexpected error opening %q: %v", filename, err)
 	}
 
-	// We have
-	var buf bytes.Buffer
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		buf.WriteString(scanner.Text())
-		buf.WriteString("\n")
-	}
-
 	var items []interface{}
-	dec := yaml.NewDecoder(&buf)
+	dec := yaml.NewDecoder(f)
 	for {
 		var item interface{}
 		if err := dec.Decode(&item); err != nil {
