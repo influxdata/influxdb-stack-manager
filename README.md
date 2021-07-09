@@ -1,5 +1,7 @@
 # InfluxDB Stack Manager
 
+![Tests](https://github.com/influxdata/influxdb-stack-manager/actions/workflows/test.yml/badge.svg?branch=main)
+
 This tool is used to help manage influxdb stacks (dashboards, tasks etc).
 It builds on top of the existing influx cli tool, transforming a single
 template into multiple, more manageable, templates and extracting any flux
