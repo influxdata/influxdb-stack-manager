@@ -1,20 +1,20 @@
 apiVersion: influxdata.com/v2alpha1
 kind: CheckThreshold
 metadata:
-    name: naughty-sutherland-8af003
+  name: naughty-sutherland-8af003
 spec:
-    every: 1m0s
-    name: CPU Usage
-    query: file://query.flux
-    status: active
-    statusMessageTemplate: 'Check: ${ r._check_name } is: ${ r._level }'
-    thresholds:
-      - level: CRIT
-        type: greater
-        value: 80
-      - level: OK
-        type: lesser
-        value: 50
-      - level: WARN
-        type: greater
-        value: 50
+  every: 1m0s
+  name: CPU Usage
+  query: file://query.flux
+  status: active
+  statusMessageTemplate: 'Check: ${ r._check_name } is: ${ r._level }'
+  thresholds:
+    - level: CRIT
+      type: greater
+      value: 80
+    - level: OK
+      type: lesser
+      value: 50
+    - level: WARN
+      type: greater
+      value: 50

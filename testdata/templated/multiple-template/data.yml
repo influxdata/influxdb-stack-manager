@@ -1,0 +1,6 @@
+measurement: cpu
+Stats:
+  Mem: mean
+  CPU: mean
+DownsampleRates:
+  CPU_Downsample: "1h"

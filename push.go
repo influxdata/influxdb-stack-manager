@@ -14,14 +14,17 @@ const pushUsage = `Push local changes to a stack in influxdb
 Usage:
   influxdb-stack-manager push <stack-id> [flags]
 
-Flags:`
+Flags:
+`
 
 func push(args []string) error {
 	var cfg config
 	var force bool
+	var dataFile string
 
 	fs := cfg.flagSet()
 	fs.BoolVar(&force, "force", false, "TTY input, if template will have destructive changes, proceed if set true.")
+	fs.StringVar(&dataFile, "data-file", "", "Data file to use for injected data in templates")
 	if err := fs.Parse(args); err != nil {
 		return fmt.Errorf("Error: %v\nSee 'influxdb-stack-manager push -h' for help", err)
 	}
@@ -35,7 +38,7 @@ func push(args []string) error {
 		return errors.New("Error: required arg missing: stack-id\nSee 'influxdb-stack-manager push -h' for help")
 	}
 
-	tmpFile, err := writeTemplateToFile(cfg.directory)
+	tmpFile, err := writeTemplateToFile(cfg.directory, dataFile)
 	if err != nil {
 		return err
 	}
@@ -57,14 +60,14 @@ func push(args []string) error {
 	return cmd.Run()
 }
 
-func writeTemplateToFile(dir string) (string, error) {
+func writeTemplateToFile(dir, dataDir string) (string, error) {
 	f, err := os.CreateTemp("", "*.yml")
 	if err != nil {
 		return "", fmt.Errorf("Error: unable to create temp file: %v", err)
 	}
 	defer f.Close()
 
-	if err := uniteTemplate(dir, f); err != nil {
+	if err := uniteTemplate(dir, f, dataDir); err != nil {
 		return "", fmt.Errorf("Error: unable to unite templates: %v", err)
 	}
 
