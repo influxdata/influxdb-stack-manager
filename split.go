@@ -94,14 +94,14 @@ func splitTemplate(dir string, r io.Reader) error {
 		for _, qn := range queryNodes {
 			// Keep track of used query names and, for any duplicates,
 			// add a numerical suffix to distinguish them.
-			var name string
+			name := qn.Name
 			if n, ok := queryNames[name]; ok {
 				name = fmt.Sprintf("%s_%d.flux", qn.Name, n)
 			} else {
 				name = fmt.Sprintf("%s.flux", qn.Name)
 			}
 			name = escapeName(name)
-			queryNames[name]++
+			queryNames[qn.Name]++
 
 			// Write out the query to file
 			filename := filepath.Join(dir, name)
