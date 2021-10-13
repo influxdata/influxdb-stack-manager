@@ -27,7 +27,6 @@ func TestSplit(t *testing.T) {
 			}
 
 			compareDirs(t, dir, filepath.Join("testdata/split", tc.Name()))
-
 		})
 	}
 }
