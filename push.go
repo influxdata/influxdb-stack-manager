@@ -19,11 +19,11 @@ Flags:
 
 func push(args []string) error {
 	var cfg config
-	var force bool
+	var force string
 	var dataFile string
 
 	fs := cfg.flagSet()
-	fs.BoolVar(&force, "force", false, "TTY input, if template will have destructive changes, proceed if set true.")
+	fs.StringVar(&force, "force", "", "Set to 'true' to skip confirmation before applying changes. Set to 'conflict' to skip confirmation and overwrite existing resources")
 	fs.StringVar(&dataFile, "data-file", "", "Data file to use for injected data in templates")
 	if err := fs.Parse(args); err != nil {
 		return fmt.Errorf("Error: %v\nSee 'influxdb-stack-manager push -h' for help", err)
@@ -45,6 +45,9 @@ func push(args []string) error {
 
 	args = []string{"apply", "--stack-id", fs.Arg(0), "-f", tmpFile}
 	args = append(args, cfg.generateArgs()...)
+	if force != "" {
+		args = append(args, "--force", force)
+	}
 	if cfg.dryRun {
 		log.Println("Dry run - calling:")
 		log.Println(cfg.influxCmd, strings.Join(args, " "))
